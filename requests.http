@@ -15,3 +15,36 @@ GET http://localhost:3000/subscriptions?sort=price
 ###
 
 GET http://localhost:3000/tasks/20
+
+###
+
+POST http://localhost:3000/tasks
+Content-Type: application/json
+
+{
+  "title": "호텔 예약하기",
+  "descriptiion": "안다즈 강남으로다가"
+}
+
+###
+
+POST http://localhost:3000/subscriptions
+Content-Type: application/json
+
+{
+  "name": "디즈니 플러스++"
+}
+
+###
+PATCH http://localhost:3000/tasks/1
+Content-Type: application/json
+
+{
+  "isComplete": true
+}
+
+###
+DELETE http://localhost:3000/tasks/2
+
+###
+DELETE http://localhost:3000/subscriptions/1

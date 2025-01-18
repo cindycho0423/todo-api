@@ -3,6 +3,7 @@ import tasks from './data/mock.js';
 import subscriptions from './data/subscriptions.js';
 
 const app = express();
+app.use(express.json());
 
 // hello request가 들어오면, 콜백 함수를 실행하라는 뜻
 // 첫 번째 파라미터: url 경로
@@ -55,6 +56,83 @@ app.get('/tasks/:id', (req, res) => {
     res.send(task);
   } else {
     // id에 해당하는 객체가 없는 경우 404 상태 코드와 오류 메시지를 담은 JSON을 돌려줌.
+    res.status(404).send({ message: 'Cannot find given id.' });
+  }
+});
+
+// app.post('/tasks', (req, res) => {
+//   const newTask = req.body;
+//   const ids = tasks.map(task => task.id);
+//   newTask.id = Math.max(...ids) + 1;
+//   newTask.isComplete = false;
+//   newTask.createdAt = new Date();
+//   newTask.updatedAt = new Date();
+
+//   tasks.push(newTask);
+//   res.status(201).send(newTask);
+// });
+
+function getNextId(arr) {
+  const ids = arr.map(elt => elt.id);
+  return Math.max(...ids) + 1;
+}
+
+app.post('/subscriptions', (req, res) => {
+  const newSubs = req.body;
+  newSubs.id = getNextId(subscriptions);
+  newSubs.createdAt = new Date();
+  newSubs.updatedAt = new Date();
+  newSubs.firstPaymentDate = new Date();
+  newSubs.price = 99000;
+  subscriptions.push(newSubs);
+  res.status(201).send(newSubs);
+});
+
+app.patch('/tasks/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const task = tasks.find(task => task.id === id);
+  if (task) {
+    Object.keys(req.body).forEach(key => {
+      task[key] = req.body[key];
+    });
+    task.updatedAt = new Date();
+    res.send(task);
+  } else {
+    res.status(404).send({ message: 'Cannot find given id.' });
+  }
+});
+
+app.patch('/subscriptions/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const subscription = subscriptions.find(sub => sub.id === id);
+
+  if (subscription) {
+    Object.keys(req.body).forEach(key => {
+      subscription[key] = req.body[key];
+    });
+    subscription.updatedAt = new Date();
+    res.send(subscription);
+  } else {
+    res.status(404).send({ message: 'Cannot find given id.' });
+  }
+});
+
+app.delete('/tasks/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const idx = tasks.findIndex(task => task.id === id);
+  if (idx >= 0) {
+    tasks.splice(idx, 1);
+  } else {
+    res.status(404).send({ message: 'Cannot find given id.' });
+  }
+});
+
+app.delete('/subscriptions/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const idx = subscriptions.findIndex(task => task.id === id);
+  if (idx >= 0) {
+    subscriptions.splice(idx, 1);
+  } else {
     res.status(404).send({ message: 'Cannot find given id.' });
   }
 });
